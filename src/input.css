@@ -1,0 +1,13 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  button {
+    @apply bg-blue-200 w-20 h-20;
+  }
+}
+
+html {
+  scroll-behavior: smooth;
+}
