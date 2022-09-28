@@ -1,6 +1,6 @@
 import "./input.css";
 
-import { evaluate, log10, log10Dependencies } from "mathjs";
+import { evaluate } from "mathjs";
 
 const buttons = document.querySelectorAll("[data-button]");
 const inputDisplay = document.getElementById("input");
@@ -39,6 +39,7 @@ modeButton.addEventListener("click", () => {
   } else if (mode === "deg") {
     setMode("rad");
   }
+  console.log("update")
   updateCalc();
 });
 
@@ -128,14 +129,14 @@ function updateCalc() {
     valStr = valStr.slice(0, -1);
   }
 
+  
   if (mode === "deg") {
-    valStr = valStr.replaceAll(/sin\((\d+)\)/g, "sin($1 / 360 * 2 * pi)");
-    valStr = valStr.replaceAll(/cos\((\d+)\)/g, "cos($1 / 360 * 2 * pi)");
-    valStr = valStr.replaceAll(/tan\((\d+)\)/g, "tan($1 / 360 * 2 * pi)");
+    valStr = valStr.replaceAll(/\b(asin|acos|atan)\b\(([^)]+)\)/g, "($1($2) * 180 / pi)");
+    valStr = valStr.replaceAll(/\b(sin|cos|tan)\b(?<!asin|acos|atan)\(([^)]+)\)/g, "$1($2 / 360 * 2 * pi)");
+
   } else if (mode === "grad") {
-    valStr = valStr.replaceAll(/sin\((\d+)\)/g, "sin($1 / 400 * 2 * pi)");
-    valStr = valStr.replaceAll(/cos\((\d+)\)/g, "cos($1 / 400 * 2 * pi)");
-    valStr = valStr.replaceAll(/tan\((\d+)\)/g, "tan($1 / 400 * 2 * pi)");
+    valStr = valStr.replaceAll(/(asin|acos|atan)\(([^)]+)\)/g, "($1($2) * 200 / pi)");
+    valStr = valStr.replaceAll(/\b(sin|cos|tan)\b(?<!asin|acos|atan)\(([^)]+)\)/g, "$1($2 / 400 * 2 * pi)");
   }
 
   valStr = valStr.replaceAll(/log10\((\d+)\)/g, "log($1, 10)");
