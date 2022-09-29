@@ -21,40 +21,46 @@
         </div>
         <!-- Modes -->
         <div class="flex justify-center gap-10">
-          <p class="font-bold" id="deg">deg</p>
-          <p class="text-gray-400" id="rad">rad</p>
-          <p class="text-gray-400" id="grad">grad</p>
+          <p class="font-bold" id="deg-display">deg</p>
+          <p class="text-gray-400" id="rad-display">rad</p>
+          <p class="text-gray-400" id="grad-display">grad</p>
         </div>
         <div class="flex gap-1">
-          <button class="w-full h-10" id="copy-output">copy output</button>
-          <button class="w-full h-10" id="copy-output">advanced</button>
+          <button class="w-full h-10" id="copy-output-button">copy output</button>
+          <button class="w-full h-10" id="advanced-button">advanced</button>
         </div>
       </div>
       <!-- Buttons -->
       <div class="flex flex-col gap-1 w-96 break-all">
         <div class="flex justify-center gap-1">
-          <button id="ac">clear</button>
+          <button id="ac-button">clear</button>
+
           <button id="mode-button">mode</button>
-          <button data-button="ln(" data-function="true">ln</button>
-          <button data-button="log(" data-function="true">log</button>
-        </div>
-        <div class="flex justify-center gap-1">
-          <button id="inverse">inverse</button>
-          <button data-button="!">!</button>
-          <button data-button="cbrt(" data-function="true">3√</button>
-          <button data-button="^2">x^2</button>
-        </div>
-        <div class="flex justify-center gap-1">
-          <button data-button="e">e</button>
           <button data-button="^">^</button>
           <button data-button="√(" data-function="true">√</button>
-          <button data-button="1/(" data-function="true">1/x</button>
         </div>
-        <div class="flex justify-center gap-1">
-          <button data-button="sin(" data-function="true" data-inv="asin(">sin</button>
-          <button data-button="cos(" data-function="true" data-inv="acos(">cos</button>
-          <button data-button="tan(" data-function="true" data-inv="atan(">tan</button>
-          <button data-button="π">π</button>
+        <div class="hidden" id="advanced-section">
+          <div class="flex justify-center gap-1">
+            <button id="inverse-button">inverse</button>
+            <button data-button="!">!</button>
+            <button data-button="ln(" data-function="true">ln</button>
+            <button data-button="log(" data-function="true">log</button>
+          </div>
+          <div class="flex justify-center gap-1">
+            <button data-button="e">e</button>
+            <button data-button="1/(" data-function="true">1/x</button>
+            <button data-button="cbrt(" data-function="true">3√</button>
+            <button data-button="^2">x^2</button>
+          </div>
+          <div class="flex justify-center gap-1">
+            <button data-button="sin(" data-function="true" data-inv="false">sin</button>
+            <button data-button="asin(" data-function="true" data-inv="true">sin<sup>-1</sup></button>
+            <button data-button="cos(" data-function="true" data-inv="false">cos</button>
+            <button data-button="acos(" data-function="true" data-inv="true">cos<sup>-1</sup></button>
+            <button data-button="tan(" data-function="true" data-inv="false">tan</button>
+            <button data-button="atan(" data-function="true" data-inv="true">tan<sup>-1</sup></button>
+            <button data-button="π">π</button>
+          </div>
         </div>
         <div class="flex justify-center gap-1">
           <button data-button=" % ">%</button>
@@ -83,8 +89,8 @@
         <div class="flex justify-center gap-1">
           <button data-button="0">0</button>
           <button data-button=".">.</button>
-          <button id="del">delete</button>
-          <button id="equals">enter</button>
+          <button id="del-button">delete</button>
+          <button id="equals-button">enter</button>
         </div>
         <div class="text-center">
           <p>Input:</p>

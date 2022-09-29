@@ -12,30 +12,81 @@ const buttons = document.querySelectorAll("[data-button]");
 const inputDisplay = document.getElementById("input");
 const outputDisplay = document.getElementById("output");
 
-const acButton = document.getElementById("ac");
-const delButton = document.getElementById("del");
-const equals = document.getElementById("equals");
-
+const acButton = document.getElementById("ac-button");
+const delButton = document.getElementById("del-button");
+const equalsButton = document.getElementById("equals-button");
 const modeButton = document.getElementById("mode-button");
-
+const copyOutputButton = document.getElementById("copy-output-button");
+const advancedButton = document.getElementById("advanced-button");
+const inverseButton = document.getElementById("inverse-button");
 const devInferredInput = document.getElementById("dev-inferred-input");
 const devOutput = document.getElementById("dev-output");
+
+const degDisplay = document.getElementById("deg-display");
+const radDisplay = document.getElementById("rad-display");
+const gradDisplay = document.getElementById("grad-display");
+
+const advancedSection = document.getElementById("advanced-section");
+
+const inverseButtonGroup = document.querySelectorAll("[data-inv]");
 
 let prevCaretPos = 0;
 
 let mode = "rad";
 
-const setMode = (newMode) => {
-  if (newMode === "rad" || newMode === "deg" || newMode === "grad") {
-    document.getElementById("rad").classList = "text-gray-400";
-    document.getElementById("deg").classList = "text-gray-400";
-    document.getElementById("grad").classList = "text-gray-400";
-    document.getElementById(newMode).classList = "font-bold";
-    mode = newMode;
-  }
-};
+let inverseMode = false;
 
+inverseButton.addEventListener("click", () => {
+  inverseMode = !inverseMode;
+  toggleInverse(inverseMode);
+});
+
+toggleInverse(false);
 setMode("rad");
+
+function toggleInverse(bool) {
+  inverseButtonGroup.forEach((button) => {
+    if (bool) {
+      // Turn on inverse buttons
+      if (button.getAttribute("data-inv") === "true") {
+        button.classList = "block";
+      } else {
+        button.classList = "hidden";
+      }
+    } else {
+      // Turn off inverse buttons
+      if (button.getAttribute("data-inv") === "false") {
+        button.classList = "block";
+      } else {
+        button.classList = "hidden";
+      }
+    }
+  });
+}
+
+advancedButton.addEventListener("click", () => {
+  if (advancedSection.classList.contains("hidden")) {
+    advancedSection.classList = "flex flex-col gap-1";
+  } else {
+    advancedSection.classList = "hidden";
+  }
+});
+
+copyOutputButton.addEventListener("click", () => {
+  // outputDisplay.select();
+  // outputDisplay.setSelectionRange(0, 999999);
+  navigator.clipboard.writeText(outputDisplay.innerText);
+});
+function setMode(newMode) {
+  if (newMode === "rad" || newMode === "deg" || newMode === "grad") {
+    degDisplay.classList = "text-gray-400";
+    radDisplay.classList = "text-gray-400";
+    gradDisplay.classList = "text-gray-400";
+    mode = newMode;
+    const elm = document.getElementById(`${mode}-display`);
+    elm.classList = "font-bold";
+  }
+}
 
 modeButton.addEventListener("click", () => {
   if (mode === "rad") {
@@ -45,13 +96,11 @@ modeButton.addEventListener("click", () => {
   } else if (mode === "deg") {
     setMode("rad");
   }
-  console.log("update");
   updateCalc();
 });
 
 buttons.forEach((button) => {
   button.addEventListener("click", (e) => {
-    console.log(utils);
     if (utils.isDesktop()) {
       prevCaretPos = inputDisplay.selectionStart || 0;
       inputDisplay.value = [
@@ -66,11 +115,9 @@ buttons.forEach((button) => {
         prevCaretPos + e.target.getAttribute("data-button").length,
         prevCaretPos + e.target.getAttribute("data-button").length
       );
-      if (button.hasAttribute("data-function")) {
-        console.log("is func");
-        inputDisplay.setSelectionRange(inputDisplay.selectionStart - 1, inputDisplay.selectionStart - 1);
-      }
-      console.log("is desk");
+      // if (button.hasAttribute("data-function")) {
+      //   inputDisplay.setSelectionRange(inputDisplay.selectionStart - 1, inputDisplay.selectionStart - 1);
+      // }
     } else {
       inputDisplay.value += e.target.getAttribute("data-button");
       updateCalc();
@@ -109,13 +156,14 @@ delButton.addEventListener("click", () => {
   updateCalc();
 });
 
-equals.addEventListener("click", () => {
+equalsButton.addEventListener("click", () => {
   if (outputDisplay.innerText === "" && inputDisplay.value !== "") {
     outputDisplay.innerText = "Error";
     return;
   }
   inputDisplay.value = outputDisplay.innerText;
   outputDisplay.innerText = "";
+  updateCalc();
 });
 
 function updateCalc() {
@@ -123,7 +171,9 @@ function updateCalc() {
   // Interpert string
   valStr = valStr.replaceAll("√", "sqrt");
   valStr = valStr.replaceAll("π", "(pi)");
-  valStr = valStr.replaceAll(" ", "");
+  // valStr = valStr.replaceAll(" ", "");
+  valStr = valStr.replaceAll(/(\blog\b)/g, "log10");
+
   valStr = valStr.replaceAll("ln", "log");
 
   valStr = valStr.replaceAll("**", "^");
@@ -134,11 +184,12 @@ function updateCalc() {
   }
 
   // If last character of the string is a operator
-  while (/[+\-*/^]$/.test(valStr)) {
+  const regexpFinalCharIsOperator = /[+\-*/^]$/;
+  while (regexpFinalCharIsOperator.test(valStr)) {
     valStr = valStr.slice(0, -1);
   }
 
-  valStr = valStr.replaceAll(/log10\((\d+)\)/g, "log($1, 10)");
+  // valStr = valStr.replaceAll(/log10\((\d+)\)/g, "log($1, 10)");
 
   devInferredInput.innerText = valStr;
 
@@ -146,7 +197,8 @@ function updateCalc() {
     let evaluation = String(math.evaluate(valStr));
     devOutput.innerText = evaluation;
     if (/^[0-9\.\-\+i\s]+/.test(evaluation) || evaluation.toLowerCase() === "nan" || evaluation === "") {
-      outputDisplay.innerText = math.evaluate(valStr);
+      const ev = math.evaluate(valStr);
+      outputDisplay.innerText = math.format(ev, { precision: 16 });
     } else {
       outputDisplay.innerText = "";
     }
@@ -156,14 +208,7 @@ function updateCalc() {
   }
 }
 
-// config
-
 let replacements = {};
-
-// our extended configuration options
-const config = {
-  angles: "deg", // 'rad', 'deg', 'grad'
-};
 
 // create trigonometric functions replacing the input depending on angle config
 const fns1 = ["sin", "cos", "tan", "sec", "cot", "csc"];
