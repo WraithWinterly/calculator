@@ -7,62 +7,94 @@
 
     <title>Wraith Calculator</title>
   </head>
-  <body class="transition-none delay-300 relative min-h-screen min-w-screen">
-    <div class="text-center flex align-items-center flex-col">
-      <input
-      type="text"
-      class="block w-62 mx-auto py-6 px-6 resize-none"
-      placeholder="Enter Calculation Here"
-      id="input"></input>
-      <div class="h-14 text-center" id="output"></div>
-      <!-- Modes -->
-      <div class="flex justify-center gap-10">
-        <p class="font-bold" id="deg">deg</p>
-        <p class="text-gray-400" id="rad">rad</p>
-        <p class="text-gray-400" id="grad">grad</p>
+  <body class="transition-none w-full">
+    <div class="delay-300 relative flex flex-col items-center gap-3 w-full">
+      <!-- Calculator Screen -->
+      <div class="text-center flex align-items-center flex-col relative">
+        <div class="w-full">
+          <input
+            type="text"
+            class="block w-full mx-auto my-3 pt-4 py-8 px-6 resize-none outline-none border-blue-100 focus:border-blue-300 border-2 rounded-md"
+            placeholder="enter calculation here"
+            id="input" />
+          <div class="h-14 text-center absolute top-14 right-4" id="output"></div>
+        </div>
+        <!-- Modes -->
+        <div class="flex justify-center gap-10">
+          <p class="font-bold" id="deg">deg</p>
+          <p class="text-gray-400" id="rad">rad</p>
+          <p class="text-gray-400" id="grad">grad</p>
+        </div>
+        <div class="flex gap-1">
+          <button class="w-full h-10" id="copy-output">copy output</button>
+          <button class="w-full h-10" id="copy-output">advanced</button>
+        </div>
       </div>
-      <div class="grid grid-cols-4 w-68 mx-auto">
+      <!-- Buttons -->
+      <div class="flex flex-col gap-1 w-96 break-all">
+        <div class="flex justify-center gap-1">
           <button id="ac">clear</button>
           <button id="mode-button">mode</button>
           <button data-button="ln(" data-function="true">ln</button>
           <button data-button="log(" data-function="true">log</button>
+        </div>
+        <div class="flex justify-center gap-1">
           <button id="inverse">inverse</button>
           <button data-button="!">!</button>
           <button data-button="cbrt(" data-function="true">3√</button>
           <button data-button="^2">x^2</button>
+        </div>
+        <div class="flex justify-center gap-1">
+          <button data-button="e">e</button>
           <button data-button="^">^</button>
           <button data-button="√(" data-function="true">√</button>
-          <button data-button=" % ">%</button>
           <button data-button="1/(" data-function="true">1/x</button>
+        </div>
+        <div class="flex justify-center gap-1">
           <button data-button="sin(" data-function="true" data-inv="asin(">sin</button>
           <button data-button="cos(" data-function="true" data-inv="acos(">cos</button>
           <button data-button="tan(" data-function="true" data-inv="atan(">tan</button>
           <button data-button="π">π</button>
-          <button data-button="e">e</button>
+        </div>
+        <div class="flex justify-center gap-1">
+          <button data-button=" % ">%</button>
           <button data-button="(">(</button>
           <button data-button=")">)</button>
           <button data-button=" / ">/</button>
+        </div>
+        <div class="flex justify-center gap-1">
           <button data-button="7">7</button>
           <button data-button="8">8</button>
           <button data-button="9">9</button>
           <button data-button=" * ">*</button>
+        </div>
+        <div class="flex justify-center gap-1">
           <button data-button="4">4</button>
           <button data-button="5">5</button>
           <button data-button="6">6</button>
           <button data-button=" - ">-</button>
+        </div>
+        <div class="flex justify-center gap-1">
           <button data-button="1">1</button>
           <button data-button="2">2</button>
           <button data-button="3">3</button>
           <button data-button=" + ">+</button>
+        </div>
+        <div class="flex justify-center gap-1">
           <button data-button="0">0</button>
           <button data-button=".">.</button>
           <button id="del">delete</button>
           <button id="equals">enter</button>
-
         </div>
-        <p id="dev-inferred-input"></p>
-        <p id="dev-output"></p>
-      <script type="module" src="./main.js"></script>
+        <div class="text-center">
+          <p>Input:</p>
+          <p id="dev-inferred-input" class="berak-all text-center"></p>
+          <p>Output:</p>
+          <p id="dev-output" class="w-full"></p>
+        </div>
+      </div>
     </div>
+
+    <script type="module" src="./main.js"></script>
   </body>
 </html>

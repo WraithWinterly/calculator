@@ -4,7 +4,7 @@
 
 @layer components {
   button {
-    @apply bg-blue-200 w-20 h-20;
+    @apply bg-blue-300 w-20 h-14 hover:bg-blue-200 rounded-md transition-colors;
   }
 }
 
