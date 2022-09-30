@@ -64,6 +64,12 @@ function toggleInverse(bool) {
   });
 }
 
+inputDisplay.addEventListener("keypress", (e) => {
+  if (e.key == "Enter") {
+    equalsConfirm();
+  }
+});
+
 advancedButton.addEventListener("click", () => {
   if (advancedSection.classList.contains("hidden")) {
     advancedSection.classList = "flex flex-col gap-1";
@@ -77,6 +83,7 @@ copyOutputButton.addEventListener("click", () => {
   // outputDisplay.setSelectionRange(0, 999999);
   navigator.clipboard.writeText(outputDisplay.innerText);
 });
+
 function setMode(newMode) {
   if (newMode === "rad" || newMode === "deg" || newMode === "grad") {
     degDisplay.classList = "text-gray-400";
@@ -157,6 +164,10 @@ delButton.addEventListener("click", () => {
 });
 
 equalsButton.addEventListener("click", () => {
+  equalsConfirm();
+});
+
+function equalsConfirm() {
   if (outputDisplay.innerText === "" && inputDisplay.value !== "") {
     outputDisplay.innerText = "Error";
     return;
@@ -164,7 +175,7 @@ equalsButton.addEventListener("click", () => {
   inputDisplay.value = outputDisplay.innerText;
   outputDisplay.innerText = "";
   updateCalc();
-});
+}
 
 function updateCalc() {
   let valStr = inputDisplay.value;
@@ -196,7 +207,13 @@ function updateCalc() {
   try {
     let evaluation = String(math.evaluate(valStr));
     devOutput.innerText = evaluation;
-    if (/^[0-9\.\-\+i\s]+/.test(evaluation) || evaluation.toLowerCase() === "nan" || evaluation === "") {
+    if (
+      /^[0-9\.\-\+i\s]+/.test(evaluation) ||
+      evaluation.toLowerCase() === "nan" ||
+      evaluation.toLowerCase() === "true" ||
+      evaluation.toLowerCase() === "false" ||
+      evaluation === ""
+    ) {
       const ev = math.evaluate(valStr);
       outputDisplay.innerText = math.format(ev, { precision: 16 });
     } else {
