@@ -36,8 +36,13 @@ let mode = "rad";
 
 let inverseMode = false;
 
+degDisplay.addEventListener("click", () => setMode("deg"));
+radDisplay.addEventListener("click", () => setMode("rad"));
+gradDisplay.addEventListener("click", () => setMode("grad"));
+
 inverseButton.addEventListener("click", () => {
   inverseMode = !inverseMode;
+
   toggleInverse(inverseMode);
 });
 
@@ -49,19 +54,28 @@ function toggleInverse(bool) {
     if (bool) {
       // Turn on inverse buttons
       if (button.getAttribute("data-inv") === "true") {
-        button.classList = "block";
+        button.classList.remove("hidden");
+        button.classList.add("block");
       } else {
-        button.classList = "hidden";
+        button.classList.remove("block");
+        button.classList.add("hidden");
       }
     } else {
       // Turn off inverse buttons
       if (button.getAttribute("data-inv") === "false") {
-        button.classList = "block";
+        button.classList.remove("hidden");
+        button.classList.add("block");
       } else {
-        button.classList = "hidden";
+        button.classList.remove("block");
+        button.classList.add("hidden");
       }
     }
   });
+  if (bool) {
+    inverseButton.classList.add("active");
+  } else {
+    inverseButton.classList.remove("active");
+  }
 }
 
 inputDisplay.addEventListener("keypress", (e) => {
@@ -73,8 +87,10 @@ inputDisplay.addEventListener("keypress", (e) => {
 advancedButton.addEventListener("click", () => {
   if (advancedSection.classList.contains("hidden")) {
     advancedSection.classList = "flex flex-col gap-1";
+    advancedButton.classList.add("active");
   } else {
     advancedSection.classList = "hidden";
+    advancedButton.classList.remove("active");
   }
 });
 
@@ -86,12 +102,13 @@ copyOutputButton.addEventListener("click", () => {
 
 function setMode(newMode) {
   if (newMode === "rad" || newMode === "deg" || newMode === "grad") {
-    degDisplay.classList = "text-gray-400";
-    radDisplay.classList = "text-gray-400";
-    gradDisplay.classList = "text-gray-400";
+    degDisplay.classList = "text-gray-400 cursor-pointer";
+    radDisplay.classList = "text-gray-400 cursor-pointer";
+    gradDisplay.classList = "text-gray-400 cursor-pointer";
     mode = newMode;
     const elm = document.getElementById(`${mode}-display`);
     elm.classList = "font-bold";
+    updateCalc(0);
   }
 }
 
@@ -103,7 +120,6 @@ modeButton.addEventListener("click", () => {
   } else if (mode === "deg") {
     setMode("rad");
   }
-  updateCalc();
 });
 
 buttons.forEach((button) => {
@@ -114,14 +130,14 @@ buttons.forEach((button) => {
         inputDisplay.value.slice(0, prevCaretPos),
         e.target.getAttribute("data-button"),
 
-        button.hasAttribute("data-function") ? ")" : "",
+        // button.hasAttribute("data-function") ? ")" : "",
         inputDisplay.value.slice(prevCaretPos),
       ].join("");
       updateCalc();
-      inputDisplay.setSelectionRange(
-        prevCaretPos + e.target.getAttribute("data-button").length,
-        prevCaretPos + e.target.getAttribute("data-button").length
-      );
+      // inputDisplay.setSelectionRange(
+      //   prevCaretPos + e.target.getAttribute("data-button").length,
+      //   prevCaretPos + e.target.getAttribute("data-button").length
+      // );
       // if (button.hasAttribute("data-function")) {
       //   inputDisplay.setSelectionRange(inputDisplay.selectionStart - 1, inputDisplay.selectionStart - 1);
       // }
@@ -133,7 +149,10 @@ buttons.forEach((button) => {
   });
 });
 
-inputDisplay.addEventListener("keyup", () => {
+inputDisplay.addEventListener("keyup", (e) => {
+  if (e.key == "Enter") {
+    return;
+  }
   updateCalc();
 });
 
@@ -156,9 +175,20 @@ acButton.addEventListener("click", () => {
 
 delButton.addEventListener("click", () => {
   // If last character of the string is a space
-  while (/\s+$/.test(inputDisplay.value)) {
+  const regexpLastCharIsStr = /\s+$/;
+  while (regexpLastCharIsStr.test(inputDisplay.value)) {
     inputDisplay.value = inputDisplay.value.slice(0, -1);
   }
+
+  const funcs = document.querySelectorAll("[data-function]");
+  const funcDatas = [];
+  funcs.forEach((func) => {
+    funcDatas.push(func.getAttribute("data-button"));
+  });
+
+  const val = inputDisplay.value;
+  console.log(val.substring(inputDisplay.selectionStart, inputDisplay.selectionStart - 4));
+
   inputDisplay.value = inputDisplay.value.slice(0, -1);
   updateCalc();
 });
@@ -167,14 +197,33 @@ equalsButton.addEventListener("click", () => {
   equalsConfirm();
 });
 
+function inputDisplayFlash(color) {
+  inputDisplay.classList.remove("transition-colors");
+  inputDisplay.classList.add("transition-none");
+  inputDisplay.classList.add(`focus:border-${color}`);
+  setTimeout(() => {
+    inputDisplay.classList.remove("transition-none");
+    inputDisplay.classList.add("transition-colors");
+    inputDisplay.classList.remove(`focus:border-${color}`);
+  }, 120);
+}
+
 function equalsConfirm() {
   if (outputDisplay.innerText === "" && inputDisplay.value !== "") {
     outputDisplay.innerText = "Error";
+    inputDisplayFlash("red-400");
+
+    return;
+  }
+  if (outputDisplay.innerText === "Error") {
+    inputDisplayFlash("red-400");
+
     return;
   }
   inputDisplay.value = outputDisplay.innerText;
   outputDisplay.innerText = "";
   updateCalc();
+  inputDisplayFlash("blue-400");
 }
 
 function updateCalc() {
@@ -182,8 +231,11 @@ function updateCalc() {
   // Interpert string
   valStr = valStr.replaceAll("√", "sqrt");
   valStr = valStr.replaceAll("π", "(pi)");
-  // valStr = valStr.replaceAll(" ", "");
-  valStr = valStr.replaceAll(/(\blog\b)/g, "log10");
+
+  valStr = valStr.replaceAll(/(log\b)/g, "log10");
+  valStr = valStr.replaceAll(/(f\b)/g, "fahrenheit");
+  valStr = valStr.replaceAll(/(c\b)/g, "celsius");
+  valStr = valStr.replaceAll(/(k\b)/g, "kelvin");
 
   valStr = valStr.replaceAll("ln", "log");
 
@@ -215,12 +267,12 @@ function updateCalc() {
       evaluation === ""
     ) {
       const ev = math.evaluate(valStr);
-      outputDisplay.innerText = math.format(ev, { precision: 16 });
+      outputDisplay.innerText = math.format(ev, { precision: 15 });
     } else {
       outputDisplay.innerText = "";
     }
   } catch {
-    devOutput.innerText = `Output: Error`;
+    devOutput.innerText = "Error";
     outputDisplay.innerText = "";
   }
 }
