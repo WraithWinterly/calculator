@@ -6,13 +6,13 @@
 # $ git push -u origin main
 
 # module.exports = {
-#   base: "/rapid-wraith/",
+#   base: "/calculator/",
 #   build: {
 #     outDir: "../dist",
 #   },
 # };
 
-
+npm run build
 git add dist -f
 git commit -m 'updating-dist'
 git subtree push --prefix dist origin gh-pages
