@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <!-- <link rel="icon" type="image/svg+xml" href="/rapidwraithlogo.png" /> -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+
+    <title>Wraith Calculator</title>
+    <script type="module" crossorigin src="/calculator/assets/index.be914294.js"></script>
+    <link rel="stylesheet" href="/calculator/assets/index.645a786a.css">
+  </head>
+  <body class="transition-none delay-300 bg-gray-900 text-gray-300 py-4">
+    <!-- Calculator -->
+    <div class="relative w-80 px-4 py-4 rounded-lg flex flex-col gap-3 mx-auto bg-black">
+      <!-- Calculator Screen -->
+      <!-- Intentional multiple tailwind border styles to allow tw to add them to the css -->
+      <div class="text-center flex align-items-center flex-col relative w-full">
+        <input
+          type="text"
+          class="block w-full mx-auto my-3 pt-4 py-8 px-6 resize-none outline-none bg-gray-800 border-gray-800 border-green-600 border-red-200 border-2 rounded-lg"
+          placeholder="enter calculation here"
+          id="input" />
+        <div class="h-14 text-center absolute top-14 right-4" id="output"></div>
+
+        <!-- Modes -->
+        <div class="w-1/2 mx-auto">
+          <div class="flex justify-between pb-2">
+            <p id="deg-button">deg</p>
+            <p id="rad-button">rad</p>
+            <p id="grad-button">grad</p>
+          </div>
+        </div>
+        <div class="flex gap-3">
+          <button class="w-full h-10" id="copy-output-button">copy output</button>
+          <button class="w-full h-10" id="advanced-button">advanced</button>
+        </div>
+      </div>
+      <!-- Buttons -->
+      <div class="flex flex-col gap-3 w-full break-all">
+        <div class="hidden" id="advanced-section">
+          <div class="flex flex-col gap-2">
+            <div class="button-row">
+              <button class="button-adv" id="inverse-button">inv</button>
+              <button class="button-adv" data-button="!">!</button>
+              <button class="button-adv" data-button="ln(" data-function="true" data-inv="false">ln</button>
+              <button class="button-adv" data-button="exp(" data-function="true" data-inv="true">e<sup>x</sup></button>
+              <button class="button-adv" data-button="log(" data-function="true" data-inv="false">log</button>
+              <button class="button-adv" data-button="10^" data-inv="true">10<sup>x</sup></button>
+            </div>
+            <div class="button-row">
+              <button class="button-adv" data-button="e">e</button>
+              <button class="button-adv" data-button="1/(" data-function="true">1/x</button>
+              <button class="button-adv" data-button="cbrt(" data-function="true">3√</button>
+              <button class="button-adv" data-button="^2">x<sup>2</sup></button>
+            </div>
+            <div class="button-row">
+              <button class="button-adv" data-button="sin(" data-function="true" data-inv="false">sin</button>
+              <button class="button-adv" data-button="asin(" data-function="true" data-inv="true">
+                sin<sup>-1</sup>
+              </button>
+              <button class="button-adv" data-button="cos(" data-function="true" data-inv="false">cos</button>
+              <button class="button-adv" data-button="acos(" data-function="true" data-inv="true">
+                cos<sup>-1</sup>
+              </button>
+              <button class="button-adv" data-button="tan(" data-function="true" data-inv="false">tan</button>
+              <button class="button-adv" data-button="atan(" data-function="true" data-inv="true">
+                tan<sup>-1</sup>
+              </button>
+              <button class="button-adv" data-button="π">π</button>
+            </div>
+            <div class="button-row">
+              <button class="button-adv" data-button="csc(" data-function="true" data-inv="false">csc</button>
+              <button class="button-adv" data-button="acsc(" data-function="true" data-inv="true">
+                csc<sup>-1</sup>
+              </button>
+              <button class="button-adv" data-button="sec(" data-function="true" data-inv="false">sec</button>
+              <button class="button-adv" data-button="asec(" data-function="true" data-inv="true">
+                sec<sup>-1</sup>
+              </button>
+              <button class="button-adv" data-button="cot(" data-function="true" data-inv="false">cot</button>
+              <button class="button-adv" data-button="acot(" data-function="true" data-inv="true">
+                cot<sup>-1</sup>
+              </button>
+              <button class="button-adv" data-button="nthRoot(">x√</button>
+            </div>
+          </div>
+        </div>
+        <div class="button-row">
+          <button class="button-clear" id="ac-button">clear</button>
+          <button id="mode-button">mode</button>
+          <button data-button="^">^</button>
+          <button data-button="√(" data-function="true">√</button>
+        </div>
+        <div class="button-row">
+          <button data-button=" % ">%</button>
+          <button data-button="(">(</button>
+          <button data-button=")">)</button>
+          <button data-button=" / " class="button-operand">/</button>
+        </div>
+        <div class="button-row">
+          <button data-button="7" class="button-number">7</button>
+          <button data-button="8" class="button-number">8</button>
+          <button data-button="9" class="button-number">9</button>
+          <button data-button=" * " class="button-operand">*</button>
+        </div>
+        <div class="button-row">
+          <button data-button="4" class="button-number">4</button>
+          <button data-button="5" class="button-number">5</button>
+          <button data-button="6" class="button-number">6</button>
+          <button data-button=" - " class="button-operand">-</button>
+        </div>
+        <div class="button-row">
+          <button data-button="1" class="button-number">1</button>
+          <button data-button="2" class="button-number">2</button>
+          <button data-button="3" class="button-number">3</button>
+          <button data-button=" + " class="button-operand">+</button>
+        </div>
+        <div class="button-row">
+          <button class="" data-button="0">0</button>
+          <button data-button=".">.</button>
+          <button id="del-button">delete</button>
+          <button class="button-enter" id="equals-button">enter</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="text-center text-black hidden">
+      <p>Input:</p>
+      <p id="dev-inferred-input" class="berak-all text-center"></p>
+      <p>Output:</p>
+      <p id="dev-output" class="w-full"></p>
+    </div>
+
+    
+  </body>
+</html>
