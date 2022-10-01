@@ -162,11 +162,12 @@ function inputDisplayFlash(success) {
 function setupAdvancedButton() {
   buttons.advanced.addEventListener("click", () => {
     if (advancedSection.classList.contains("hidden")) {
-      advancedSection.classList = "flex flex-col gap-1";
+      advancedSection.classList.remove("hidden");
       buttons.advanced.classList.add("active");
     } else {
-      advancedSection.classList = "hidden";
       buttons.advanced.classList.remove("active");
+      advancedSection.classList.add("hidden");
+      toggleInverse(false);
     }
   });
 }
