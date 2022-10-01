@@ -4,10 +4,10 @@
 
 @layer components {
   button {
-    @apply bg-gray-800 hover:bg-gray-700 w-20 h-14 rounded-xl  transition-colors;
+    @apply bg-gray-800 hover:bg-gray-700 active:bg-gray-600 w-20 h-14 rounded-xl  transition-colors;
   }
   .button-adv {
-    @apply bg-gray-700 w-20 h-10 hover:bg-gray-600 transition-colors;
+    @apply bg-gray-700 w-20 h-10 hover:bg-gray-600 active:bg-gray-500 transition-colors;
   }
 
   .button-row {
@@ -15,18 +15,30 @@
   }
 
   .active {
-    @apply bg-slate-500 hover:bg-slate-600;
+    @apply bg-slate-500 hover:bg-slate-600 active:bg-slate-500;
   }
 
   .button-operand {
-    @apply bg-purple-900 hover:bg-purple-800;
+    @apply bg-purple-900 hover:bg-purple-800 active:bg-purple-700;
   }
 
   .button-number {
-    @apply bg-slate-700 hover:bg-slate-600;
+    @apply bg-slate-700 hover:bg-slate-600 active:bg-slate-500;
+  }
+
+  .button-enter {
+    @apply bg-green-900 hover:bg-green-800 active:bg-green-700;
+  }
+
+  .button-clear {
+    @apply bg-sky-900 hover:bg-sky-800 active:bg-sky-700;
   }
 }
 
 html {
   scroll-behavior: smooth;
+}
+
+button {
+  touch-action: manipulation;
 }

@@ -1,6 +1,6 @@
 import "./input.css";
 
-import { create, all, ConstantNodeDependencies } from "mathjs";
+import { create, all } from "mathjs";
 
 import utilsFunc from "./utils";
 
@@ -144,18 +144,27 @@ function setupInputDisplay() {
       inputDisplay.focus();
     });
   }
-  inputDisplay.classList.remove("focus:border-green-600");
-  inputDisplay.classList.remove("focus:border-red-200");
+  inputDisplay.classList.remove("border-green-600");
+  inputDisplay.classList.remove("border-red-200");
 }
 
-function inputDisplayFlash(success) {
+function inputDisplayFlash(color) {
+  const trgClass =
+    color === "green"
+      ? "border-green-600"
+      : color === "red"
+      ? "border-red-200"
+      : color === "blue"
+      ? "border-sky-600"
+      : "";
+
   inputDisplay.classList.remove("transition-colors");
   inputDisplay.classList.add("transition-none");
-  inputDisplay.classList.add(success ? "focus:border-green-600" : "focus:border-red-200");
+  inputDisplay.classList.add(trgClass);
   setTimeout(() => {
     inputDisplay.classList.remove("transition-none");
     inputDisplay.classList.add("transition-colors");
-    inputDisplay.classList.remove(success ? "focus:border-green-600" : "focus:border-red-200");
+    inputDisplay.classList.remove(trgClass);
   }, 200);
 }
 
@@ -203,6 +212,7 @@ function setupAcButton() {
   buttons.ac.addEventListener("click", () => {
     inputDisplay.value = "";
     outputDisplay.innerText = "";
+    inputDisplayFlash("blue");
   });
 }
 function setupDelButton() {
@@ -213,14 +223,13 @@ function setupDelButton() {
       inputDisplay.value = inputDisplay.value.slice(0, -1);
     }
 
-    const funcs = document.querySelectorAll("[data-function]");
-    const funcDatas = [];
-    funcs.forEach((func) => {
-      funcDatas.push(func.getAttribute("data-button"));
-    });
+    // const funcs = document.querySelectorAll("[data-function]");
+    // const funcDatas = [];
+    // funcs.forEach((func) => {
+    //   funcDatas.push(func.getAttribute("data-button"));
+    // });
 
-    const val = inputDisplay.value;
-    console.log(val.substring(inputDisplay.selectionStart, inputDisplay.selectionStart - 4));
+    // const val = inputDisplay.value;
 
     inputDisplay.value = inputDisplay.value.slice(0, -1);
     updateCalc();
@@ -236,12 +245,12 @@ function setupEqualsButton() {
 function equalsConfirm() {
   if (outputDisplay.innerText === "" && inputDisplay.value !== "") {
     outputDisplay.innerText = "Error";
-    inputDisplayFlash(false);
+    inputDisplayFlash("red");
 
     return;
   }
   if (outputDisplay.innerText === "Error") {
-    inputDisplayFlash(false);
+    inputDisplayFlash("red");
 
     return;
   }
@@ -250,7 +259,7 @@ function equalsConfirm() {
   inputDisplay.value = inputDisplay.value.replaceAll("°C", "cel");
   outputDisplay.innerText = "";
   updateCalc();
-  inputDisplayFlash(true);
+  inputDisplayFlash("green");
 }
 
 function updateCalc() {
@@ -292,7 +301,6 @@ function updateCalc() {
     const formattedAnswer = math.format(evaluation, { precision: 12 });
 
     if (regexpIsNumberOrComplexNumber.test(evaluation) || hasAllowedValue) {
-      console.log(formattedAnswer);
       outputDisplay.innerText = formattedAnswer;
       outputDisplay.innerText = outputDisplay.innerText.replaceAll("fahrenheit", "°F");
       outputDisplay.innerText = outputDisplay.innerText.replaceAll("celsius", "°C");

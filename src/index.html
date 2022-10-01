@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <!-- <link rel="icon" type="image/svg+xml" href="/rapidwraithlogo.png" /> -->
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
 
     <title>Wraith Calculator</title>
   </head>
@@ -15,7 +15,7 @@
       <div class="text-center flex align-items-center flex-col relative w-full">
         <input
           type="text"
-          class="block w-full mx-auto my-3 pt-4 py-8 px-6 resize-none outline-none bg-gray-800 border-gray-800 focus:border-blue-300 focus:border-green-600 focus:border-red-200 border-2 rounded-lg"
+          class="block w-full mx-auto my-3 pt-4 py-8 px-6 resize-none outline-none bg-gray-800 border-gray-800 border-green-600 border-red-200 border-2 rounded-lg"
           placeholder="enter calculation here"
           id="input" />
         <div class="h-14 text-center absolute top-14 right-4" id="output"></div>
@@ -84,7 +84,7 @@
           </div>
         </div>
         <div class="button-row">
-          <button id="ac-button">clear</button>
+          <button class="button-clear" id="ac-button">clear</button>
           <button id="mode-button">mode</button>
           <button data-button="^">^</button>
           <button data-button="√(" data-function="true">√</button>
@@ -117,7 +117,7 @@
           <button class="" data-button="0">0</button>
           <button data-button=".">.</button>
           <button id="del-button">delete</button>
-          <button class="bg bg-green-900" id="equals-button">enter</button>
+          <button class="button-enter" id="equals-button">enter</button>
         </div>
       </div>
     </div>
