@@ -1,229 +1,255 @@
 import "./input.css";
 
-import { create, all } from "mathjs";
+import { create, all, ConstantNodeDependencies } from "mathjs";
 
-import utilsImp from "./utils";
+import utilsFunc from "./utils";
 
-const utils = new utilsImp();
+const utils = new utilsFunc();
 
 const math = create(all, {});
 
-const buttons = document.querySelectorAll("[data-button]");
+const buttons = {
+  ac: document.getElementById("ac-button"),
+  del: document.getElementById("del-button"),
+  equals: document.getElementById("equals-button"),
+  cycleMode: document.getElementById("mode-button"),
+  copyOutput: document.getElementById("copy-output-button"),
+  advanced: document.getElementById("advanced-button"),
+  inverse: document.getElementById("inverse-button"),
+};
+
+const modeButtons = {
+  deg: document.getElementById("deg-button"),
+  rad: document.getElementById("rad-button"),
+  grad: document.getElementById("grad-button"),
+};
+
+const modes = ["deg", "rad", "grad"];
+
 const inputDisplay = document.getElementById("input");
 const outputDisplay = document.getElementById("output");
-
-const acButton = document.getElementById("ac-button");
-const delButton = document.getElementById("del-button");
-const equalsButton = document.getElementById("equals-button");
-const modeButton = document.getElementById("mode-button");
-const copyOutputButton = document.getElementById("copy-output-button");
-const advancedButton = document.getElementById("advanced-button");
-const inverseButton = document.getElementById("inverse-button");
-const devInferredInput = document.getElementById("dev-inferred-input");
-const devOutput = document.getElementById("dev-output");
-
-const degDisplay = document.getElementById("deg-display");
-const radDisplay = document.getElementById("rad-display");
-const gradDisplay = document.getElementById("grad-display");
-
 const advancedSection = document.getElementById("advanced-section");
 
-const inverseButtonGroup = document.querySelectorAll("[data-inv]");
+const dev_inputToMathJS = document.getElementById("dev-inferred-input");
+const dev_mathJsRawOutput = document.getElementById("dev-output");
+
+let currentMode = "rad";
 
 let prevCaretPos = 0;
 
-let mode = "rad";
-
 let inverseMode = false;
 
-degDisplay.addEventListener("click", () => setMode("deg"));
-radDisplay.addEventListener("click", () => setMode("rad"));
-gradDisplay.addEventListener("click", () => setMode("grad"));
+onLoad();
 
-inverseButton.addEventListener("click", () => {
-  inverseMode = !inverseMode;
+function onLoad() {
+  setupModes();
+  setupInputDisplay();
+  setupInverseButton();
+  setupAdvancedButton();
+  setupEqualsButton();
+  setupCalculatorButtons();
+  setupAcButton();
+  setupDelButton();
+  setupCopyOutputButton();
 
-  toggleInverse(inverseMode);
-});
-
-toggleInverse(false);
-setMode("rad");
-
-function toggleInverse(bool) {
-  inverseButtonGroup.forEach((button) => {
-    if (bool) {
-      // Turn on inverse buttons
-      if (button.getAttribute("data-inv") === "true") {
-        button.classList.remove("hidden");
-        button.classList.add("block");
-      } else {
-        button.classList.remove("block");
-        button.classList.add("hidden");
-      }
-    } else {
-      // Turn off inverse buttons
-      if (button.getAttribute("data-inv") === "false") {
-        button.classList.remove("hidden");
-        button.classList.add("block");
-      } else {
-        button.classList.remove("block");
-        button.classList.add("hidden");
-      }
-    }
-  });
-  if (bool) {
-    inverseButton.classList.add("active");
-  } else {
-    inverseButton.classList.remove("active");
-  }
+  setupMathJsModeConfig();
 }
 
-inputDisplay.addEventListener("keypress", (e) => {
-  if (e.key == "Enter") {
-    equalsConfirm();
-  }
-});
+// Modes
+function setupModes() {
+  modeButtons.deg.addEventListener("click", () => setMode("deg"));
+  modeButtons.rad.addEventListener("click", () => setMode("rad"));
+  modeButtons.grad.addEventListener("click", () => setMode("grad"));
 
-advancedButton.addEventListener("click", () => {
-  if (advancedSection.classList.contains("hidden")) {
-    advancedSection.classList = "flex flex-col gap-1";
-    advancedButton.classList.add("active");
-  } else {
-    advancedSection.classList = "hidden";
-    advancedButton.classList.remove("active");
-  }
-});
+  buttons.cycleMode.addEventListener("click", () => {
+    if (currentMode === "rad") {
+      setMode("grad");
+    } else if (currentMode === "grad") {
+      setMode("deg");
+    } else if (currentMode === "deg") {
+      setMode("rad");
+    }
+  });
 
-copyOutputButton.addEventListener("click", () => {
-  // outputDisplay.select();
-  // outputDisplay.setSelectionRange(0, 999999);
-  navigator.clipboard.writeText(outputDisplay.innerText);
-});
+  setMode("rad");
+}
 
 function setMode(newMode) {
-  if (newMode === "rad" || newMode === "deg" || newMode === "grad") {
-    degDisplay.classList = "text-gray-400 cursor-pointer";
-    radDisplay.classList = "text-gray-400 cursor-pointer";
-    gradDisplay.classList = "text-gray-400 cursor-pointer";
-    mode = newMode;
-    const elm = document.getElementById(`${mode}-display`);
-    elm.classList = "font-bold";
-    updateCalc(0);
+  if (modes.includes(newMode)) {
+    const defaultClassList = "text-gray-400 cursor-pointer";
+    modes.forEach((mode) => {
+      modeButtons[mode].classList = defaultClassList;
+    });
+
+    currentMode = newMode;
+    const newModeButton = modeButtons[newMode];
+    newModeButton.classList = "font-bold";
+    updateCalc();
   }
 }
 
-modeButton.addEventListener("click", () => {
-  if (mode === "rad") {
-    setMode("grad");
-  } else if (mode === "grad") {
-    setMode("deg");
-  } else if (mode === "deg") {
-    setMode("rad");
+// Inverse Button
+function setupInverseButton() {
+  buttons.inverse.addEventListener("click", () => {
+    inverseMode = !inverseMode;
+
+    toggleInverse(inverseMode);
+  });
+
+  toggleInverse(false);
+}
+
+function toggleInverse(toggleOn) {
+  // Color change if active
+  if (toggleOn) {
+    buttons.inverse.classList.add("active");
+  } else {
+    buttons.inverse.classList.remove("active");
   }
-});
 
-buttons.forEach((button) => {
-  button.addEventListener("click", (e) => {
-    if (utils.isDesktop()) {
-      prevCaretPos = inputDisplay.selectionStart || 0;
-      inputDisplay.value = [
-        inputDisplay.value.slice(0, prevCaretPos),
-        e.target.getAttribute("data-button"),
-
-        // button.hasAttribute("data-function") ? ")" : "",
-        inputDisplay.value.slice(prevCaretPos),
-      ].join("");
-      updateCalc();
-      // inputDisplay.setSelectionRange(
-      //   prevCaretPos + e.target.getAttribute("data-button").length,
-      //   prevCaretPos + e.target.getAttribute("data-button").length
-      // );
-      // if (button.hasAttribute("data-function")) {
-      //   inputDisplay.setSelectionRange(inputDisplay.selectionStart - 1, inputDisplay.selectionStart - 1);
-      // }
+  const setShowState = (isShowing, btn) => {
+    if (isShowing) {
+      btn.classList.remove("hidden");
+      btn.classList.add("block");
     } else {
-      inputDisplay.value += e.target.getAttribute("data-button");
-      updateCalc();
+      btn.classList.remove("block");
+      btn.classList.add("hidden");
+    }
+  };
+
+  const inverseButtonGroup = document.querySelectorAll("[data-inv]");
+
+  inverseButtonGroup.forEach((button) => {
+    const isInverseButton = button.getAttribute("data-inv") === "true";
+    setShowState(toggleOn === isInverseButton, button);
+  });
+}
+
+// Input Display
+function setupInputDisplay() {
+  inputDisplay.addEventListener("keyup", (e) => {
+    if (e.key == "Enter") {
+      equalsConfirm();
       return;
     }
+    updateCalc();
   });
-});
 
-inputDisplay.addEventListener("keyup", (e) => {
-  if (e.key == "Enter") {
-    return;
+  if (utils.isDesktop()) {
+    inputDisplay.focus();
   }
-  updateCalc();
-});
 
-if (utils.isDesktop()) {
-  inputDisplay.focus();
-}
-
-if (utils.isDesktop()) {
-  inputDisplay.addEventListener("blur", (e) => {
-    {
+  if (utils.isDesktop()) {
+    inputDisplay.addEventListener("blur", (e) => {
       inputDisplay.focus();
-    }
-  });
+    });
+  }
+  inputDisplay.classList.remove("focus:border-green-600");
+  inputDisplay.classList.remove("focus:border-red-200");
 }
 
-acButton.addEventListener("click", () => {
-  inputDisplay.value = "";
-  outputDisplay.innerText = "";
-});
-
-delButton.addEventListener("click", () => {
-  // If last character of the string is a space
-  const regexpLastCharIsStr = /\s+$/;
-  while (regexpLastCharIsStr.test(inputDisplay.value)) {
-    inputDisplay.value = inputDisplay.value.slice(0, -1);
-  }
-
-  const funcs = document.querySelectorAll("[data-function]");
-  const funcDatas = [];
-  funcs.forEach((func) => {
-    funcDatas.push(func.getAttribute("data-button"));
-  });
-
-  const val = inputDisplay.value;
-  console.log(val.substring(inputDisplay.selectionStart, inputDisplay.selectionStart - 4));
-
-  inputDisplay.value = inputDisplay.value.slice(0, -1);
-  updateCalc();
-});
-
-equalsButton.addEventListener("click", () => {
-  equalsConfirm();
-});
-
-function inputDisplayFlash(color) {
+function inputDisplayFlash(success) {
   inputDisplay.classList.remove("transition-colors");
   inputDisplay.classList.add("transition-none");
-  inputDisplay.classList.add(`focus:border-${color}`);
+  inputDisplay.classList.add(success ? "focus:border-green-600" : "focus:border-red-200");
   setTimeout(() => {
     inputDisplay.classList.remove("transition-none");
     inputDisplay.classList.add("transition-colors");
-    inputDisplay.classList.remove(`focus:border-${color}`);
-  }, 120);
+    inputDisplay.classList.remove(success ? "focus:border-green-600" : "focus:border-red-200");
+  }, 200);
+}
+
+function setupAdvancedButton() {
+  buttons.advanced.addEventListener("click", () => {
+    if (advancedSection.classList.contains("hidden")) {
+      advancedSection.classList = "flex flex-col gap-1";
+      buttons.advanced.classList.add("active");
+    } else {
+      advancedSection.classList = "hidden";
+      buttons.advanced.classList.remove("active");
+    }
+  });
+}
+function setupCopyOutputButton() {
+  buttons.copyOutput.addEventListener("click", () => {
+    // outputDisplay.select();
+    // outputDisplay.setSelectionRange(0, 999999);
+    navigator.clipboard.writeText(outputDisplay.innerText);
+  });
+}
+
+function setupCalculatorButtons() {
+  document.querySelectorAll("[data-button]").forEach((button) => {
+    button.addEventListener("click", (e) => {
+      if (utils.isDesktop()) {
+        prevCaretPos = inputDisplay.selectionStart || 0;
+        inputDisplay.value = [
+          inputDisplay.value.slice(0, prevCaretPos),
+          e.target.getAttribute("data-button"),
+          inputDisplay.value.slice(prevCaretPos),
+        ].join("");
+        updateCalc();
+      } else {
+        inputDisplay.value += e.target.getAttribute("data-button");
+        updateCalc();
+        return;
+      }
+    });
+  });
+}
+
+function setupAcButton() {
+  buttons.ac.addEventListener("click", () => {
+    inputDisplay.value = "";
+    outputDisplay.innerText = "";
+  });
+}
+function setupDelButton() {
+  buttons.del.addEventListener("click", () => {
+    // If last character of the string is a space
+    const regexpLastCharIsStr = /\s+$/;
+    while (regexpLastCharIsStr.test(inputDisplay.value)) {
+      inputDisplay.value = inputDisplay.value.slice(0, -1);
+    }
+
+    const funcs = document.querySelectorAll("[data-function]");
+    const funcDatas = [];
+    funcs.forEach((func) => {
+      funcDatas.push(func.getAttribute("data-button"));
+    });
+
+    const val = inputDisplay.value;
+    console.log(val.substring(inputDisplay.selectionStart, inputDisplay.selectionStart - 4));
+
+    inputDisplay.value = inputDisplay.value.slice(0, -1);
+    updateCalc();
+  });
+}
+
+function setupEqualsButton() {
+  buttons.equals.addEventListener("click", () => {
+    equalsConfirm();
+  });
 }
 
 function equalsConfirm() {
   if (outputDisplay.innerText === "" && inputDisplay.value !== "") {
     outputDisplay.innerText = "Error";
-    inputDisplayFlash("red-400");
+    inputDisplayFlash(false);
 
     return;
   }
   if (outputDisplay.innerText === "Error") {
-    inputDisplayFlash("red-400");
+    inputDisplayFlash(false);
 
     return;
   }
   inputDisplay.value = outputDisplay.innerText;
+  inputDisplay.value = inputDisplay.value.replaceAll("°F", "far");
+  inputDisplay.value = inputDisplay.value.replaceAll("°C", "cel");
   outputDisplay.innerText = "";
   updateCalc();
-  inputDisplayFlash("blue-400");
+  inputDisplayFlash(true);
 }
 
 function updateCalc() {
@@ -233,15 +259,16 @@ function updateCalc() {
   valStr = valStr.replaceAll("π", "(pi)");
 
   valStr = valStr.replaceAll(/(log\b)/g, "log10");
-  valStr = valStr.replaceAll(/(f\b)/g, "fahrenheit");
-  valStr = valStr.replaceAll(/(c\b)/g, "celsius");
-  valStr = valStr.replaceAll(/(k\b)/g, "kelvin");
+  valStr = valStr.replaceAll(/(far\b)/g, "fahrenheit");
+  valStr = valStr.replaceAll(/(cel\b)/g, "celsius");
+  valStr = valStr.replaceAll(/(kel\b)/g, "kelvin");
 
   valStr = valStr.replaceAll("ln", "log");
 
   valStr = valStr.replaceAll("**", "^");
 
-  let missingCommas = valStr.split("(").length - valStr.split(")").length;
+  const missingCommas = valStr.split("(").length - valStr.split(")").length;
+
   for (let i = 0; i < missingCommas; i++) {
     valStr += ")";
   }
@@ -252,91 +279,105 @@ function updateCalc() {
     valStr = valStr.slice(0, -1);
   }
 
-  // valStr = valStr.replaceAll(/log10\((\d+)\)/g, "log($1, 10)");
-
-  devInferredInput.innerText = valStr;
+  dev_inputToMathJS.innerText = valStr;
 
   try {
-    let evaluation = String(math.evaluate(valStr));
-    devOutput.innerText = evaluation;
-    if (
-      /^[0-9\.\-\+i\s]+/.test(evaluation) ||
-      evaluation.toLowerCase() === "nan" ||
-      evaluation.toLowerCase() === "true" ||
-      evaluation.toLowerCase() === "false" ||
-      evaluation === ""
-    ) {
-      const ev = math.evaluate(valStr);
-      outputDisplay.innerText = math.format(ev, { precision: 15 });
+    const evaluation = math.evaluate(valStr);
+    dev_mathJsRawOutput.innerText = evaluation;
+
+    const regexpIsNumberOrComplexNumber = /^[0-9\.\-\+i\s]+/;
+    const allowedValues = ["Infinity", "NaN", "Error", "", "true", "false"];
+    const hasAllowedValue = allowedValues.includes(evaluation);
+    const formattedAnswer = math.format(evaluation, { precision: 12 });
+
+    if (regexpIsNumberOrComplexNumber.test(evaluation) || hasAllowedValue) {
+      console.log(formattedAnswer);
+      outputDisplay.innerText = formattedAnswer;
+      outputDisplay.innerText = outputDisplay.innerText.replaceAll("fahrenheit", "°F");
+      outputDisplay.innerText = outputDisplay.innerText.replaceAll("celsius", "°C");
+      outputDisplay.innerText = outputDisplay.innerText.replaceAll('"', "");
     } else {
       outputDisplay.innerText = "";
     }
   } catch {
-    devOutput.innerText = "Error";
+    dev_mathJsRawOutput.innerText = "Error";
     outputDisplay.innerText = "";
   }
 }
 
-let replacements = {};
+function setupMathJsModeConfig() {
+  let replacements = {};
 
-// create trigonometric functions replacing the input depending on angle config
-const fns1 = ["sin", "cos", "tan", "sec", "cot", "csc"];
+  // Create trigonometric functions replacing the input depending on angle config
+  const trigFuncs = ["sin", "cos", "tan", "sec", "cot", "csc"];
 
-fns1.forEach(function (name) {
-  const fn = math[name]; // the original function
+  trigFuncs.forEach((name) => {
+    const fn = math[name]; // The original function
 
-  const fnNumber = function (x) {
-    // convert from configured type of angles to radians
-    switch (mode) {
-      case "deg":
-        return fn((x / 360) * 2 * Math.PI);
-      case "grad":
-        return fn((x / 400) * 2 * Math.PI);
-      default:
-        return fn(x);
-    }
-  };
-
-  // create a typed-function which check the input types
-  replacements[name] = math.typed(name, {
-    number: fnNumber,
-    "Array | Matrix": function (x) {
-      return math.map(x, fnNumber);
-    },
-  });
-});
-
-// create trigonometric functions replacing the output depending on angle config
-const fns2 = ["asin", "acos", "atan", "atan2", "acot", "acsc", "asec"];
-fns2.forEach(function (name) {
-  const fn = math[name]; // the original function
-
-  const fnNumber = function (x) {
-    const result = fn(x);
-
-    if (typeof result === "number") {
-      // convert to radians to configured type of angles
-      switch (mode) {
+    const fnNumber = function (x) {
+      // Convert from configured type of angles to radians
+      switch (currentMode) {
         case "deg":
-          return (result / 2 / Math.PI) * 360;
+          return fn((x / 360) * 2 * Math.PI);
         case "grad":
-          return (result / 2 / Math.PI) * 400;
+          return fn((x / 400) * 2 * Math.PI);
         default:
-          return result;
+          return fn(x);
       }
-    }
+    };
 
-    return result;
-  };
-
-  // create a typed-function which check the input types
-  replacements[name] = math.typed(name, {
-    number: fnNumber,
-    "Array | Matrix": function (x) {
-      return math.map(x, fnNumber);
-    },
+    // Create a typed-function which check the input types
+    replacements[name] = math.typed(name, {
+      number: fnNumber,
+      "Array | Matrix": function (x) {
+        return math.map(x, fnNumber);
+      },
+    });
   });
-});
 
-// import all replacements into math.js, override existing trigonometric functions
-math.import(replacements, { override: true });
+  const inverseTrigFuncs = ["asin", "acos", "atan", "atan2", "acot", "acsc", "asec"];
+  inverseTrigFuncs.forEach((name) => {
+    const fn = math[name];
+
+    const fnNumber = function (x) {
+      const result = fn(x);
+
+      if (typeof result === "number") {
+        switch (currentMode) {
+          case "deg":
+            return (result / 2 / Math.PI) * 360;
+          case "grad":
+            return (result / 2 / Math.PI) * 400;
+          default:
+            return result;
+        }
+      }
+
+      return result;
+    };
+
+    // Create a typed-function which check the input types
+    replacements[name] = math.typed(name, {
+      number: fnNumber,
+      "Array | Matrix": function (x) {
+        return math.map(x, fnNumber);
+      },
+    });
+  });
+
+  // Import all replacements into math.js, override existing trigonometric functions
+  math.import(replacements, { override: true });
+
+  var originalDivide = math.divide;
+  math.import(
+    {
+      divide: function (a, b) {
+        if (math.isZero(b)) {
+          return "Error";
+        }
+        return originalDivide(a, b);
+      },
+    },
+    { override: true }
+  );
+}

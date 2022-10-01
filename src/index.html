@@ -11,10 +11,11 @@
     <!-- Calculator -->
     <div class="relative w-80 flex flex-col gap-1 mx-auto">
       <!-- Calculator Screen -->
+      <!-- Intentional multiple tailwind border styles to allow tw to add them to the css -->
       <div class="text-center flex align-items-center flex-col relative w-full">
         <input
           type="text"
-          class="block w-full mx-auto my-3 pt-4 py-8 px-6 resize-none outline-none border-blue-100 focus:border-blue-300 border-2 rounded-md"
+          class="block w-full mx-auto my-3 pt-4 py-8 px-6 resize-none outline-none border-blue-100 focus:border-blue-300 focus:border-green-600 focus:border-red-200 border-2 rounded-md"
           placeholder="enter calculation here"
           id="input" />
         <div class="h-14 text-center absolute top-14 right-4" id="output"></div>
@@ -22,9 +23,9 @@
         <!-- Modes -->
         <div class="w-1/2 mx-auto">
           <div class="flex justify-between">
-            <p class="" id="deg-display">deg</p>
-            <p class="" id="rad-display">rad</p>
-            <p class="" id="grad-display">grad</p>
+            <p id="deg-button">deg</p>
+            <p id="rad-button">rad</p>
+            <p id="grad-button">grad</p>
           </div>
         </div>
         <div class="flex gap-1">
@@ -56,6 +57,15 @@
             <button class="h-10" data-button="acos(" data-function="true" data-inv="true">cos<sup>-1</sup></button>
             <button class="h-10" data-button="tan(" data-function="true" data-inv="false">tan</button>
             <button class="h-10" data-button="atan(" data-function="true" data-inv="true">tan<sup>-1</sup></button>
+            <button class="h-10" data-button="π">π</button>
+          </div>
+          <div class="button-row">
+            <button class="h-10" data-button="csc(" data-function="true" data-inv="false">sin</button>
+            <button class="h-10" data-button="acsc(" data-function="true" data-inv="true">sin<sup>-1</sup></button>
+            <button class="h-10" data-button="sec(" data-function="true" data-inv="false">cos</button>
+            <button class="h-10" data-button="asec(" data-function="true" data-inv="true">cos<sup>-1</sup></button>
+            <button class="h-10" data-button="cot(" data-function="true" data-inv="false">tan</button>
+            <button class="h-10" data-button="acot(" data-function="true" data-inv="true">tan<sup>-1</sup></button>
             <button class="h-10" data-button="π">π</button>
           </div>
         </div>
